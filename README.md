@@ -1,10 +1,10 @@
-# Barangay Animal Health & Welfare System
+# Barangay Animal Healthcare System
 
 A responsive, web-based business system designed to help a barangay organize and manage animal health and welfare services, including pet registration, rabies vaccination tracking, animal bite case reporting, pet adoption and rescue, and animal welfare mission updates.
 
 ## 1. Project Overview
 
-The **Barangay Animal Health & Welfare System** provides a centralized platform for residents, pet owners, barangay personnel, and authorized administrators to access and manage animal-related information and services.
+The **Barangay Animal Healthcare System** provides a centralized platform for residents, pet owners, barangay personnel, and authorized administrators to access and manage animal-related information and services.
 
 The system aims to improve record organization, make information easier to access, and support the delivery of animal health and welfare services within the community.
 
@@ -66,7 +66,7 @@ By organizing these functions in one system, the project aims to support more ef
 - Provide relevant adoption details and contact information where available.
 
 ### Animal Welfare Missions
-- Display information about barangay animal health and welfare activities.
+- Display information about Barangay Animal Healthcare activities.
 - Present mission details, schedules, locations, and descriptions where provided.
 - Support community awareness of available services.
 
@@ -252,12 +252,12 @@ The project was reviewed and tested during development. The submitted implementa
 - [x] README documentation prepared.
 - [x] Project ZIP prepared for submission.
 - [x] GitHub repository prepared, if required by the instructor.
-- [x] Screenshots or a demonstration prepared, if required by the instructor.
+- [ ] Screenshots or a demonstration prepared, if required by the instructor.
 
 ---
 
-**Project:** Barangay Animal Health & Welfare System
+**Project:** Barangay Animal Healthcare System
 
-**Purpose:** To provide a centralized website for managing and accessing barangay animal health and welfare services.
+**Purpose:** To provide a centralized website for managing and accessing Barangay Animal Healthcare services.
 
 **Developed using:** HTML, CSS, JavaScript, and Firebase.
