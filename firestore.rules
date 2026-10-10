@@ -1,0 +1,180 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
+    function isAdmin() {
+      return signedIn() && (request.auth.uid == 'rJfo8plRZnZ0c4SU9kJfUEmH5cC3'
+        || (exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
+    }
+
+    match /users/{uid} {
+      allow create: if isSelf(uid) && request.resource.data.role == 'user' && request.resource.data.uid == uid;
+      allow read: if isSelf(uid) || isAdmin();
+      allow update: if isAdmin() || (isSelf(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'uid']));
+      allow delete: if isSelf(uid) || isAdmin();
+    }
+
+    // Full pet documents are private to the owner and admins.
+    match /pets/{petId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid);
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerBarangay is string && request.resource.data.ownerAddress is string;
+      allow update: if isAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid);
+      allow delete: if isAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid);
+    }
+    // Residents may view vaccination history, but only admins may add/change/delete it.
+
+    // Safe public summary: residents can read only pet name, age, and rabies/vaccine status.
+    // Do not put owner names, contacts, addresses, breed, sex, or birthday in this collection.
+    match /publicPetRegistry/{petId} {
+      allow read: if signedIn();
+      allow create, update: if isAdmin() || (signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['ownerUid','petName','age','ageYears','ageMonths','rabiesStatus','updatedAt'])
+        && request.resource.data.petName is string
+        && request.resource.data.age is string
+        && request.resource.data.rabiesStatus is string);
+      allow delete: if isAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid);
+    }
+    match /vaccinations/{recordId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+    match /bitecases/{caseId} {
+      // Barangay admins can see/manage every report. Signed-in residents can
+      // see published cases and their own reports while they await review.
+      // Residents can read their own reports, plus any report the barangay has
+      // explicitly marked Published or Investigated. Do not require publishedAt:
+      // older approved records may predate that field.
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.reporterUid == request.auth.uid)
+        || (signedIn() && resource.data.status in ['Published', 'Investigated']);
+      // Residents may only submit reports that start in Pending Review.
+      // Admins may directly publish cases they receive or witness themselves.
+      allow create: if isAdmin() || (signedIn()
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.status == 'Pending Review'
+        && request.resource.data.postedByAdmin == false
+        && request.resource.data.victimName is string
+        && request.resource.data.animalType is string
+        && request.resource.data.incidentDate is string
+        && request.resource.data.incidentBarangay is string
+        && request.resource.data.incidentAddress is string
+        && request.resource.data.reporterBarangay is string
+        && request.resource.data.reporterAddress is string
+        && request.resource.data.description is string);
+      // Barangay admins may approve resident reports immediately, mark them investigated,
+      // or otherwise manage cases without waiting for the former 30-minute hold.
+      allow update: if isAdmin();
+      // Reporters cannot delete reports; the barangay removes them after investigation.
+      allow delete: if isAdmin();
+    }
+
+    match /news/{newsId} {
+      // Community news is intentionally public so signed-out visitors and residents can read it.
+      // Only administrators can create, edit, or delete news.
+      allow read: if true;
+      allow create: if isAdmin() && request.resource.data.status == 'Published'
+        && request.resource.data.headline is string && request.resource.data.description is string
+        && request.resource.data.when is string && request.resource.data.where is string
+        && request.resource.data.barangay is string && request.resource.data.address is string
+        && request.resource.data.postedByUid == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    match /dashboardStats/{statsId} {
+      allow read: if statsId == 'summary';
+      allow create, update, delete: if isAdmin() && statsId == 'summary';
+    }
+    match /recentActivity/{activityId} {
+      allow read: if true;
+      allow create: if signedIn() && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.title is string && request.resource.data.description is string;
+      allow update, delete: if isAdmin() || (signedIn() && resource.data.actorUid == request.auth.uid);
+    }
+    match /missions/{missionId} {
+      allow read: if resource.data.status == 'Approved' || isAdmin() || (signedIn() && resource.data.submitterUid == request.auth.uid);
+      // Residents and volunteer/charity groups submit proposals for review; admins may publish directly.
+      allow create: if signedIn() && request.resource.data.submitterUid == request.auth.uid
+        && request.resource.data.eventName is string && request.resource.data.eventDate is string
+        && request.resource.data.location is string && request.resource.data.locationBarangay is string
+        && request.resource.data.locationPlace is string && request.resource.data.submitterBarangay is string
+        && request.resource.data.submitterAddress is string
+        && request.resource.data.submitterType in ['Resident', 'Barangay Admin', 'Volunteer / Charity Organization']
+        && request.resource.data.interactionTypes is list && request.resource.data.interactionTypes.size() >= 1
+        && request.resource.data.interactionTypes.size() <= 2
+        && request.resource.data.interactionTypes.hasOnly(['register','volunteer','participate','view'])
+        && ((request.resource.data.submitterType == 'Volunteer / Charity Organization'
+          && request.resource.data.organizationName is string && request.resource.data.organizationName.size() > 0
+          && request.resource.data.organizationRegistration is string && request.resource.data.organizationRegistration.size() > 0
+          && request.resource.data.organizationContact is string && request.resource.data.organizationContact.size() > 0
+          && request.resource.data.organizationPhone is string && request.resource.data.organizationPhone.size() > 0
+          && request.resource.data.organizationEmail is string && request.resource.data.organizationEmail.size() > 0)
+          || request.resource.data.submitterType != 'Volunteer / Charity Organization')
+        && ((isAdmin() && request.resource.data.status == 'Approved')
+          || (!isAdmin() && request.resource.data.status == 'Pending' && request.resource.data.submitterType != 'Barangay Admin'));
+      allow update: if isAdmin()
+        || (signedIn() && resource.data.submitterUid == request.auth.uid
+          && resource.data.status == 'Pending'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['eventName','eventDate','registrationDeadline','location','category','description','updatedAt','interactionTypes']))
+        || (signedIn() && resource.data.status == 'Approved'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['participantCount'])
+          && request.resource.data.participantCount is int
+          && ((('participantCount' in resource.data) && request.resource.data.participantCount == resource.data.participantCount + 1)
+            || (!('participantCount' in resource.data) && request.resource.data.participantCount == 1)));
+      allow delete: if isAdmin() || (signedIn() && resource.data.submitterUid == request.auth.uid && resource.data.status == 'Pending');
+    }
+    match /missionResponses/{responseId} {
+      allow create: if signedIn()
+        && request.resource.data.respondentUid == request.auth.uid
+        && request.resource.data.missionId is string
+        && request.resource.data.mode in ['register','volunteer','participate']
+        && get(/databases/$(database)/documents/missions/$(request.resource.data.missionId)).data.status == 'Approved';
+      allow read: if signedIn() && (resource.data.respondentUid == request.auth.uid
+        || get(/databases/$(database)/documents/missions/$(resource.data.missionId)).data.submitterUid == request.auth.uid || isAdmin());
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+    match /notifications/{notificationId} {
+      allow read: if signedIn() && (resource.data.recipientUid == request.auth.uid || (resource.data.recipientRole == 'admin' && isAdmin()));
+      allow create: if signedIn() && request.resource.data.senderUid == request.auth.uid
+        && request.resource.data.title is string && request.resource.data.message is string
+        && (request.resource.data.recipientUid is string || request.resource.data.recipientRole == 'admin');
+      allow update: if signedIn() && resource.data.recipientUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow delete: if isAdmin() || (signedIn() && resource.data.recipientUid == request.auth.uid);
+    }
+
+    match /adoptions/{adoptionId} {
+      allow read: if true;
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerBarangay is string && request.resource.data.ownerAddress is string
+        && request.resource.data.ownerPlace is string;
+      allow update: if isAdmin() || (signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'statusUpdatedAt'])
+        && request.resource.data.status in ['Available', 'Pending', 'In Process', 'Adopted']);
+      allow delete: if isAdmin();
+    }
+    match /adoptionRequests/{requestId} {
+      allow create: if signedIn() && request.resource.data.applicantUid == request.auth.uid
+        && request.resource.data.ownerUid == get(/databases/$(database)/documents/adoptions/$(request.resource.data.adoptionId)).data.ownerUid
+        && request.resource.data.participants is list && request.auth.uid in request.resource.data.participants;
+      allow read: if isAdmin() || (signedIn() && (request.auth.uid == resource.data.ownerUid || request.auth.uid in resource.data.participants));
+      allow update: if isAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']));
+      allow delete: if isAdmin();
+    }
+    match /messages/{messageId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.participants;
+      allow create: if signedIn() && request.resource.data.senderUid == request.auth.uid
+        && request.auth.uid in request.resource.data.participants && request.resource.data.participants is list
+        && request.resource.data.requestId is string
+        && get(/databases/$(database)/documents/adoptionRequests/$(request.resource.data.requestId)).data.participants == request.resource.data.participants;
+      allow update, delete: if false;
+    }
+  }
+}

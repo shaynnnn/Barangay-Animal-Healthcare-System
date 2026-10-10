@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In | Barangay Animal Healthcare System</title><link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="firebase.js"></script>
+</head>
+<body class="auth-page">
+<header class="site-header"><a class="auth-brand" href="index.html"><svg class="paw-logo auth-paw" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="63" rx="27" ry="24"/><ellipse cx="25" cy="35" rx="10" ry="15"/><ellipse cx="43" cy="22" rx="10" ry="15"/><ellipse cx="62" cy="22" rx="10" ry="15"/><ellipse cx="78" cy="35" rx="10" ry="15"/></svg><span class="brand-name"><span>Barangay Animal</span><span>Healthcare System</span></span></a><nav id="mainNav"><a href="index.html">Home</a><a class="active" href="login.html">Log In</a><a href="register.html">Register</a></nav></header>
+<main class="auth-main"><section class="auth-card"><div class="auth-card-icon"><svg class="paw-logo auth-paw" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="63" rx="27" ry="24"/><ellipse cx="25" cy="35" rx="10" ry="15"/><ellipse cx="43" cy="22" rx="10" ry="15"/><ellipse cx="62" cy="22" rx="10" ry="15"/><ellipse cx="78" cy="35" rx="10" ry="15"/></svg></div><h1>Welcome Back!</h1><p>Log in to your Barangay Animal Healthcare System account.</p><form id="loginForm"><div class="form-group"><label for="email">Email Address <span class="required">*</span></label><input type="email" id="email" autocomplete="email" required placeholder="you@example.com"></div><div class="form-group"><label for="password">Password <span class="required">*</span></label><input type="password" id="password" autocomplete="current-password" required placeholder="Enter your password"></div><p id="authMessage" class="auth-message" aria-live="polite"></p><button type="submit" class="primary-btn full-btn">Log In</button></form><p class="auth-switch">Don't have an account? <a href="register.html">Create one</a></p><p class="auth-back"><a href="index.html">← Back to Home</a></p></section></main>
+<footer class="site-footer">Barangay Animal Health System © 2026 <span>|</span> Contact: <a href="mailto:brgyoffice@email.com">brgyoffice@email.com</a></footer>
+<script src="auth.js"></script></body></html>
