@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Adoption
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="../style.css">
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script src="../firebase.js"></script>
+
+</head>
+
+
+<body>
+
+
+<header class="site-header">
+
+    <div class="brand">
+
+        <svg
+            class="paw-logo"
+            viewBox="0 0 100 100">
+
+            <ellipse cx="50" cy="63" rx="27" ry="24"/>
+            <ellipse cx="25" cy="35" rx="10" ry="15"/>
+            <ellipse cx="43" cy="22" rx="10" ry="15"/>
+            <ellipse cx="62" cy="22" rx="10" ry="15"/>
+            <ellipse cx="78" cy="35" rx="10" ry="15"/>
+
+        </svg>
+
+
+        <div class="brand-name">
+
+            <div>
+                Barangay Animal
+            </div>
+
+            <div>
+                Healthcare System
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="menu-toggle"
+        onclick="toggleMenu()">
+
+        ☰
+
+    </button>
+
+
+     <nav id="mainNav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="news.html">News</a><a href="registry.html">Registry</a><a href="vaccination.html">Vaccination</a><a href="bitecases.html">Bite Case</a><a href="adoption.html" class="active" aria-current="page">Adoption</a><a href="missions.html">Mission</a></nav>
+
+</header>
+
+
+
+<main class="module-page">
+
+
+    <a
+        href="../index.html"
+        class="back-home">
+
+        ← Back Home
+
+    </a>
+
+
+
+    <div class="module-heading">
+
+        <div>
+
+            <h1>
+                Pet Adoption
+            </h1>
+
+            <p>
+                Give animals a second chance to find a loving home.
+            </p>
+
+        </div>
+
+
+        <div class="heading-buttons">
+
+            <button
+                class="primary-btn"
+                onclick="openAdoptionForm()">
+
+                + Add Adoption
+
+            </button>
+
+
+            <button
+                class="secondary-btn"
+                onclick="openOwnerDashboard()">
+
+                Adoption Requests
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         ADD ADOPTION
+    ====================================================== -->
+
+    <section
+        id="adoptionForm"
+        class="form-panel hidden">
+
+        <h2>
+            List an Animal for Adoption
+        </h2>
+
+
+        <form id="addAdoptionForm">
+
+
+            <div class="form-grid">
+
+
+                <!-- PET NAME - OPTIONAL -->
+
+                <div class="form-group">
+
+                    <label for="petName">
+
+                        Pet Name
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="petName"
+                        placeholder="e.g. Bantay">
+
+                </div>
+
+
+
+                <!-- ANIMAL TYPE - REQUIRED -->
+
+                <div class="form-group">
+
+                    <label for="animalType">
+
+                        Animal Type
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <select
+                        id="animalType"
+                        required>
+
+                        <option value="">
+                            Select animal type
+                        </option>
+
+                        <option value="Dog">
+                            Dog
+                        </option>
+
+                        <option value="Cat">
+                            Cat
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group hidden" id="adoptionOtherAnimalTypeGroup">
+                    <label for="adoptionOtherAnimalType">Specify Animal Species <span class="required">*</span></label>
+                    <input type="text" id="adoptionOtherAnimalType" maxlength="80" placeholder="e.g. turtle, rabbit, bird">
+                </div>
+
+                <!-- SEX - REQUIRED -->
+
+                <div class="form-group">
+
+                    <label for="petSex">
+
+                        Sex
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <select
+                        id="petSex"
+                        required>
+
+                        <option value="">
+                            Select sex
+                        </option>
+
+                        <option value="Male">
+                            ♂ Male
+                        </option>
+
+                        <option value="Female">
+                            ♀ Female
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- AGE - REQUIRED -->
+
+                <div class="form-group">
+
+                    <label>
+
+                        Age
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <div class="age-inputs">
+
+                        <input
+                            type="number"
+                            id="petAgeYears"
+                            min="0"
+                            placeholder="Years"
+                            required>
+
+
+                        <input
+                            type="number"
+                            id="petAgeMonths"
+                            min="0"
+                            max="11"
+                            placeholder="Months (0-11)"
+                            required>
+
+                    </div>
+
+
+                    <small>
+                        Example: 2 years and 3 months
+                    </small>
+
+                </div>
+
+
+
+                <!-- BREED - REQUIRED -->
+
+                <div class="form-group">
+
+                    <label for="petBreed">
+
+                        Breed
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="petBreed"
+                        placeholder="e.g. Aspin, Persian, Poodle"
+                        required>
+
+                </div>
+
+
+
+                <!-- VACCINATION STATUS - REQUIRED -->
+
+                <div class="form-group">
+
+                    <label for="vaccinationStatus">
+
+                        Vaccination Status
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <select
+                        id="vaccinationStatus"
+                        required>
+
+                        <option value="">
+                            Select vaccination status
+                        </option>
+
+                        <option value="Complete">
+                            Complete
+                        </option>
+
+                        <option value="Partially Vaccinated">
+                            Partially Vaccinated
+                        </option>
+
+                        <option value="Not Vaccinated">
+                            Not Vaccinated
+                        </option>
+
+                        <option value="Unknown">
+                            Unknown
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- DESCRIPTION - REQUIRED -->
+
+            <div class="form-group">
+
+                <label for="petDescription">
+
+                    Description
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <textarea
+                    id="petDescription"
+                    placeholder="e.g. Friendly and playful dog looking for a loving home..."
+                    required></textarea>
+
+            </div>
+
+
+
+            <!-- PERSON POSTING -->
+
+            <h3>
+                Person Posting the Adoption
+            </h3>
+
+
+
+            <div class="form-grid">
+
+
+                <!-- NAME - REQUIRED -->
+
+                <div class="form-group">
+
+                    <label for="ownerName">
+
+                        Name
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="ownerName"
+                        placeholder="e.g. Juan Dela Cruz"
+                        required>
+
+                </div>
+
+
+
+                <!-- CONTACT - REQUIRED -->
+
+                <div class="form-group">
+
+                    <label for="ownerContact">
+
+                        Contact Number
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        type="tel"
+                        id="ownerContact"
+                        placeholder="e.g. 09123456789"
+                        required>
+
+                </div>
+
+
+
+                <!-- EMAIL - REQUIRED -->
+
+                <div class="form-group">
+
+                    <label for="ownerEmail">
+
+                        Email
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        type="email"
+                        id="ownerEmail"
+                        placeholder="e.g. juan@email.com"
+                        required>
+
+                </div>
+
+
+            </div>
+
+
+
+            <h3>Owner Address and Location</h3>
+            <div class="form-grid">
+              <div class="form-group"><label for="adoptionOwnerBarangay">Barangay <span class="required">*</span></label><select id="adoptionOwnerBarangay" required><option value="">Select barangay</option><option>San Andres (Poblacion)</option><option>Santo Domingo</option><option>San Isidro</option><option>San Juan</option><option>Santo Niño</option><option>Santa Rosa</option><option>San Roque</option></select></div>
+              <div class="form-group"><label for="adoptionOwnerPlace">Subdivision / Village / Community <span class="required">*</span></label><select id="adoptionOwnerPlace" required><option value="">Select barangay first</option></select></div>
+              <div class="form-group"><label for="adoptionOwnerAddress">House / Unit / Building / Street / Purok <span class="required">*</span></label><input id="adoptionOwnerAddress" required maxlength="220" placeholder="Enter full address details"></div>
+            </div>
+
+            <!-- ANIMAL IMAGE -->
+
+            <h3>
+
+                Choose Animal Image
+
+                <span class="required">
+                    *
+                </span>
+
+            </h3>
+
+
+            <div class="pet-image-options">
+
+
+                <!-- DOG -->
+
+                <label class="image-option">
+
+                    <input
+                        type="radio"
+                        name="petImage"
+                        value="dog.webp"
+                        required>
+
+
+                    <img
+                        src="../Images/dog.webp"
+                        alt="Dog">
+
+
+                    <span>
+                        Dog
+                    </span>
+
+                </label>
+
+
+
+                <!-- PUP -->
+
+                <label class="image-option">
+
+                    <input
+                        type="radio"
+                        name="petImage"
+                        value="pup.webp">
+
+
+                    <img
+                        src="../Images/pup.webp"
+                        alt="Pup">
+
+
+                    <span>
+                        Pup
+                    </span>
+
+                </label>
+
+
+
+                <!-- CAT -->
+
+                <label class="image-option">
+
+                    <input
+                        type="radio"
+                        name="petImage"
+                        value="cat.webp">
+
+
+                    <img
+                        src="../Images/cat.webp"
+                        alt="Cat">
+
+
+                    <span>
+                        Cat
+                    </span>
+
+                </label>
+
+
+
+                <!-- KIT -->
+
+                <label class="image-option">
+
+                    <input
+                        type="radio"
+                        name="petImage"
+                        value="kit.webp">
+
+
+                    <img
+                        src="../Images/kit.webp"
+                        alt="Kit">
+
+
+                    <span>
+                        Kit
+                    </span>
+
+                </label>
+
+
+            </div>
+
+
+
+            <br>
+
+
+            <button
+                type="submit"
+                class="primary-btn">
+
+                Add Adoption
+
+            </button>
+
+
+        </form>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         ADOPTION LISTINGS
+    ====================================================== -->
+
+    <section>
+
+        <h2>
+            Animals Looking for a Home
+        </h2>
+
+
+        <div
+            id="adoptionList"
+            class="adoption-grid">
+
+            Loading...
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+
+<!-- =====================================================
+     ADOPTION REQUEST
+====================================================== -->
+
+<div
+    id="requestModal"
+    class="modal hidden">
+
+
+    <div class="modal-content">
+
+
+        <button
+            class="modal-close"
+            onclick="closeRequestModal()">
+
+            ×
+
+        </button>
+
+
+        <h2>
+            I Want to Adopt
+        </h2>
+
+
+        <p id="requestPetName"></p>
+
+
+        <form id="adoptionRequestForm">
+
+
+            <input type="hidden" id="requestAdoptionId">
+            <div class="form-grid">
+              <div class="form-group"><label for="applicantBarangay">Your Barangay <span class="required">*</span></label><select id="applicantBarangay" required><option value="">Select barangay</option><option>San Andres (Poblacion)</option><option>Santo Domingo</option><option>San Isidro</option><option>San Juan</option><option>Santo Niño</option><option>Santa Rosa</option><option>San Roque</option></select></div>
+              <div class="form-group"><label for="applicantAddress">Your Full Address <span class="required">*</span></label><input id="applicantAddress" required maxlength="220" placeholder="House/unit, street, subdivision/village, phase, purok (required)"></div>
+            </div>
+
+
+
+            <!-- YOUR NAME -->
+
+            <div class="form-group">
+
+                <label for="applicantName">
+
+                    Your Name
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="applicantName"
+                    placeholder="e.g. Maria Santos"
+                    required>
+
+            </div>
+
+
+
+            <!-- CONTACT -->
+
+            <div class="form-group">
+
+                <label for="applicantContact">
+
+                    Contact Number
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="tel"
+                    id="applicantContact"
+                    placeholder="e.g. 09123456789"
+                    required>
+
+            </div>
+
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label for="applicantEmail">
+
+                    Email
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="email"
+                    id="applicantEmail"
+                    placeholder="e.g. maria@email.com"
+                    required>
+
+            </div>
+
+
+
+            <!-- BARANGAY -->
+
+
+
+            <!-- REASON -->
+
+            <div class="form-group">
+
+                <label for="adoptionReason">
+
+                    Why do you want to adopt?
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <textarea
+                    id="adoptionReason"
+                    placeholder="e.g. I want to give this animal a safe and loving home."
+                    required></textarea>
+
+            </div>
+
+
+
+            <!-- MESSAGE -->
+
+            <div class="form-group">
+
+                <label for="applicantMessage">
+
+                    Message to Owner
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <textarea
+                    id="applicantMessage"
+                    placeholder="e.g. Hello, I am interested in adopting your pet."
+                    required></textarea>
+
+            </div>
+
+
+
+            <button
+                class="primary-btn full-btn"
+                type="submit">
+
+                Send Adoption Request
+
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     OWNER REQUESTS
+====================================================== -->
+
+<div
+    id="ownerModal"
+    class="modal hidden">
+
+
+    <div class="modal-content">
+
+
+        <button
+            class="modal-close"
+            onclick="closeOwnerDashboard()">
+
+            ×
+
+        </button>
+
+
+        <h2>
+            Adoption Requests
+        </h2>
+
+
+        <p>
+            Enter the email address used when
+            posting the animal.
+        </p>
+
+
+        <div class="owner-login">
+
+
+            <input
+                type="email"
+                id="ownerDashboardEmail"
+                placeholder="e.g. juan@email.com">
+
+
+            <button
+                class="primary-btn"
+                onclick="loadOwnerRequests()">
+
+                View Requests
+
+            </button>
+
+
+        </div>
+
+
+        <div id="ownerRequestsList">
+
+            Enter your email to view requests.
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     MESSAGES
+====================================================== -->
+
+<div
+    id="messageModal"
+    class="modal hidden">
+
+
+    <div
+        class="modal-content message-window">
+
+
+        <button
+            class="modal-close"
+            onclick="closeMessageModal()">
+
+            ×
+
+        </button>
+
+
+        <h2 id="messageTitle">
+
+            Messages
+
+        </h2>
+
+
+        <div
+            id="messagesContainer"
+            class="messages-container">
+
+        </div>
+
+
+        <form
+            id="messageForm"
+            class="message-form">
+
+
+            <input
+                type="text"
+                id="messageInput"
+                placeholder="Type your message..."
+                required>
+
+
+            <button
+                class="primary-btn">
+
+                Send
+
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     FOOTER
+====================================================== -->
+
+<footer class="site-footer">
+
+    Barangay Animal Health System © 2026
+
+    <span>|</span>
+
+    Contact:
+
+    <a href="mailto:brgyoffice@email.com">
+
+        brgyoffice@email.com
+
+    </a>
+
+</footer>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+ const placeMap = {"San Andres (Poblacion)":["Provident Village (PFCI)","Saint Anthony Subdivision","Cainta Greenland Executive Village Phase 1","Cainta Greenland Executive Village Phase 2","Cainta Greenland Executive Village Phase 3","Cainta Greenland Executive Village Phase 4","Cainta Greenland Executive Village Phase 5","Cainta Greenland Executive Village Phase 6","Cainta Greenland Executive Village Phase 7","Cainta Greenland Executive Village Phase 8","Greenwoods Executive Village Phase 1 (Cainta)","Greenwoods Executive Village Phase 2 (Cainta)","Greenwoods Executive Village Phase 3 (Cainta)","Greenwoods Executive Village Phase 4 (Cainta)","Greenwoods Executive Village Phase 5 (Cainta)","Greenwoods Executive Village Phase 6 (Cainta)","Greenwoods Executive Village Phase 7 (Cainta)","Greenwoods Executive Village Phase 8 (Cainta)","Greenwoods Executive Village Phase 9 (Cainta)","Midtown Village Phase 1","Midtown Village Phase 2","Midtown Village Phase 3","Midtown Village Phase 4","Planters Products Compound","Sitio Parola","A. Bonifacio Avenue Residential Area","Calle Robledo Residential Area","J. Sumulong Street Residential Area"],"Santo Domingo":["Brookside Hills Subdivision Phase 1","Brookside Hills Subdivision Phase 2","Brookside Hills Subdivision Phase 3","Brookside Hills Subdivision Phase 4","Marick Subdivision Phase 1","Marick Subdivision Phase 2","San Buena Compound","San Buena Village","Gruar Suburban Heights Phase 1","Gruar Suburban Heights Phase 2","Village East Executive Homes Phase 1","Village East Executive Homes Phase 2","Riverside Compound","Sunrise Subdivision","Saint Dominic Subdivision Phase 1","Saint Dominic Subdivision Phase 2"],"San Isidro":["Karangalan Village Phase 1A","Karangalan Village Phase 1B","Karangalan Village Phase 2A","Karangalan Village Phase 2B","Cainta Greenpark Village","Vista Verde Executive Village Phase 1","Vista Verde Executive Village Phase 2","Vista Verde Executive Village Phase 3","V.V. Soliven Homes Phase 1","V.V. Soliven Homes Phase 2","CVS Homes","Dacon Homes","Sitio Balanti","Sitio Halang","Exodus Floodway Residential Community"],"San Juan":["Don Mariano Subdivision","Cambridge Village Condominiums","Valley Golf Subdivision","Country Homes Subdivision","Executive Heights","L. Santos Compound","Sunset Drive Community","Palmera Homes Phase 1","Palmera Homes Phase 2","Midland Subdivision","General A. Ricarte Street Residential Area"],"Santo Niño":["Santo Domingo Subdivision II","Doña Pepeng Subdivision","Midtown Village Extension","Filinvest East Homes Phase 1 (Cainta)","Filinvest East Homes Phase 2 (Cainta)","San Martin Subdivision Phase 1","San Martin Subdivision Phase 2"],"Santa Rosa":["J.P. Rizal Historic Heritage District","Old Town Heritage District","Parola Compound Sector","Our Lady of Light Parish Enclave"],"San Roque":["Amang Rodriguez Residential Corridor","Parola Sector (San Roque Boundary)","Marikina-Cainta Boundary Community"]};
+ function bindPlace(barangayId, placeId){
+  const b=document.getElementById(barangayId), p=document.getElementById(placeId);
+  if(!b||!p)return;
+  function sync(){
+   const list=placeMap[b.value]||[];
+   p.innerHTML='<option value="">Select subdivision / village / community</option>'+list.map(x=>'<option value="'+x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'">'+x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</option>').join('');
+   p.disabled=list.length===0;
+  }
+  b.addEventListener('change',sync);sync();
+ }
+ bindPlace('adoptionOwnerBarangay','adoptionOwnerPlace');
+ const animal=document.getElementById('animalType'),og=document.getElementById('adoptionOtherAnimalTypeGroup'),oi=document.getElementById('adoptionOtherAnimalType');if(animal&&og&&oi){function syncAnimal(){const other=animal.value==='Other';og.classList.toggle('hidden',!other);oi.required=other;if(!other)oi.value='';}animal.addEventListener('change',syncAnimal);syncAnimal();}
+});
+</script>
+<script src="../app.js"></script>
+<script src="../auth.js"></script>
+
+
+</body>
+
+</html>
